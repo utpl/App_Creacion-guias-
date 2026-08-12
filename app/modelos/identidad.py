@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base_datos import Base
@@ -101,3 +101,23 @@ class Sesion(Base):
     )
 
     usuario: Mapped["Usuario"] = relationship()
+
+
+class RegistroAuditoria(Base):
+    __tablename__ = "registro_auditoria"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("usuario.id"), default=None, index=True
+    )
+    accion: Mapped[str] = mapped_column(String(60), index=True)
+    tipo_entidad: Mapped[str | None] = mapped_column(String(40), default=None)
+    id_entidad: Mapped[str | None] = mapped_column(String(60), default=None)
+    detalles: Mapped[dict | None] = mapped_column(JSONB, default=None)
+    ip: Mapped[str | None] = mapped_column(String(45), default=None)
+    agente_usuario: Mapped[str | None] = mapped_column(String(255), default=None)
+    ocurrido_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )

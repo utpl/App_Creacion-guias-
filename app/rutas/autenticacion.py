@@ -14,6 +14,7 @@ from app.modelos import Usuario
 from app.seguridad import sesiones
 from app.seguridad.passwords import verificar
 from app.seguridad.csrf import exigir_csrf
+from app.seguridad import auditoria
 
 from app.seguridad.dependencias import usuario_actual
 
@@ -59,7 +60,12 @@ def procesar_login(
     )
 
     # Si esta bloqueado, no se intenta verificar.
+
     if usuario and usuario.bloqueado_hasta and usuario.bloqueado_hasta > _ahora():
+        auditoria.registrar(
+            bd, "ingreso.bloqueado", actor_id=usuario.id,
+            detalles={"correo": correo_normalizado}, request=request,
+        )
         return plantillas.TemplateResponse(
             request, "login.html",
             {"error": MENSAJE_CREDENCIALES, "correo": correo_normalizado},
@@ -71,6 +77,7 @@ def procesar_login(
         password, usuario.hash_password if usuario else None
     )
 
+    
     if not credenciales_validas or usuario is None:
         if usuario is not None:
             usuario.intentos_fallidos += 1
@@ -78,6 +85,11 @@ def procesar_login(
             if minutos:
                 usuario.bloqueado_hasta = _ahora() + timedelta(minutes=minutos)
             bd.commit()
+        auditoria.registrar(
+            bd, "ingreso.fallido",
+            actor_id=usuario.id if usuario else None,
+            detalles={"correo": correo_normalizado}, request=request,
+        )
         return plantillas.TemplateResponse(
             request, "login.html",
             {"error": MENSAJE_CREDENCIALES, "correo": correo_normalizado},
@@ -85,6 +97,21 @@ def procesar_login(
         )
 
     if usuario.estado != "ACTIVO":
+        auditoria.registrar(
+            bd, "ingreso.rechazado", actor_id=usuario.id,
+            detalles={"motivo": "cuenta no activa"}, request=request,
+        )
+        return plantillas.TemplateResponse(
+            request, "login.html",
+            {"error": MENSAJE_CREDENCIALES, "correo": correo_normalizado},
+            status_code=401,
+        )
+
+    if usuario.vigencia_hasta is not None and usuario.vigencia_hasta <= _ahora():
+        auditoria.registrar(
+            bd, "ingreso.rechazado", actor_id=usuario.id,
+            detalles={"motivo": "vigencia vencida"}, request=request,
+        )
         return plantillas.TemplateResponse(
             request, "login.html",
             {"error": MENSAJE_CREDENCIALES, "correo": correo_normalizado},
@@ -108,6 +135,9 @@ def procesar_login(
         ip=request.client.host if request.client else None,
         agente_usuario=request.headers.get("user-agent"),
     )
+    auditoria.registrar(
+        bd, "ingreso.exitoso", actor_id=usuario.id, request=request,
+    )
 
     respuesta = RedirectResponse(url="/inicio", status_code=303)
     respuesta.set_cookie(
@@ -126,7 +156,12 @@ def procesar_login(
 def salir(request: Request, bd: Session = Depends(obtener_sesion)):
     token = request.cookies.get(sesiones.NOMBRE_COOKIE)
     if token:
+        usuario = sesiones.obtener_usuario(bd, token)
         sesiones.revocar(bd, token)
+        if usuario:
+            auditoria.registrar(
+                bd, "sesion.cerrada", actor_id=usuario.id, request=request
+            )
     respuesta = RedirectResponse(url="/ingresar", status_code=303)
     respuesta.delete_cookie(sesiones.NOMBRE_COOKIE, path="/")
     return respuesta

@@ -1,3 +1,9 @@
-from app.modelos.identidad import Rol, Sesion, Usuario, UsuarioRol
+from app.modelos.identidad import (
+    RegistroAuditoria,
+    Rol,
+    Sesion,
+    Usuario,
+    UsuarioRol,
+)
 
-__all__ = ["Rol", "Sesion", "Usuario", "UsuarioRol"]
+__all__ = ["RegistroAuditoria", "Rol", "Sesion", "Usuario", "UsuarioRol"]
