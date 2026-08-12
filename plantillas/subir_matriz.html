@@ -68,13 +68,21 @@
   </tbody>
 </table>
 
-<form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz/eliminar">
-  <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
-  <button class="ed-boton ed-boton--contorno" type="submit">
-    Reemplazar matriz
-  </button>
-</form>
+<div style="display:flex; gap:var(--ed-space-3); margin-top:var(--ed-space-4);">
+  <form method="post" action="/asignaturas/{{ asignatura.codigo }}/guia/iniciar">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <button class="ed-boton ed-boton--primario" type="submit">
+      Crear guía de {{ matriz.semanas_totales }} semanas
+    </button>
+  </form>
 
+  <form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz/eliminar">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <button class="ed-boton ed-boton--contorno" type="submit">
+      Reemplazar matriz
+    </button>
+  </form>
+</div>
 {% else %}
 
 <div class="ed-tarjeta" style="max-width:620px;">

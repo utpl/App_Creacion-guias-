@@ -1,0 +1,61 @@
+{% extends "marco.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}{{ asignatura.codigo }} · Guía · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<p style="margin:0 0 var(--ed-space-2);">
+  <a href="/asignaturas" style="color:var(--ed-link); font-size:var(--ed-size-sm);
+     text-decoration:none;">← Mis asignaturas</a>
+</p>
+
+<h1 class="ed-titulo-pagina" style="margin-bottom:var(--ed-space-2);">
+  {{ asignatura.nombre }}
+</h1>
+<p style="color:var(--ed-text-muted); margin:0 0 var(--ed-space-6);">
+  {{ asignatura.codigo }} · {{ periodo.nombre }} ·
+  {{ guia.semanas_totales }} semanas
+</p>
+
+<div class="ed-progreso">
+  <div class="ed-progreso__barra">
+    <div class="ed-progreso__relleno" style="width: {{ porcentaje }}%;"></div>
+  </div>
+  <p class="ed-progreso__texto">
+    {{ aprobadas }} de {{ guia.semanas_totales }} semanas aprobadas
+  </p>
+</div>
+
+<div class="ed-semanas">
+  {% for s in semanas %}
+  <article class="ed-semana">
+    <div class="ed-semana__numero">{{ s.numero }}</div>
+
+    <div class="ed-semana__cuerpo">
+      <p class="ed-semana__tema">{{ temas.get(s.numero, '—') }}</p>
+      <p class="ed-semana__meta">
+        {% if s.estado == 'APROBADA' %}
+        <span class="ed-distintivo ed-distintivo--exito">Aprobada</span>
+        {% elif s.estado == 'GENERADA' %}
+        <span class="ed-distintivo ed-distintivo--info">Generada</span>
+        {% elif s.estado == 'GENERANDO' %}
+        <span class="ed-distintivo ed-distintivo--aviso">Generando…</span>
+        {% else %}
+        <span class="ed-distintivo ed-distintivo--aviso">Pendiente</span>
+        {% endif %}
+        <span style="color:var(--ed-text-muted); font-size:var(--ed-size-xs);
+                     margin-left:var(--ed-space-2);">
+          {{ s.intentos_concedidos - s.intentos_usados }} de
+          {{ s.intentos_concedidos }} intentos disponibles
+        </span>
+      </p>
+    </div>
+
+    <div class="ed-semana__accion">
+      <span style="color:var(--ed-text-muted); font-size:var(--ed-size-xs);">
+        Generación no disponible aún
+      </span>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

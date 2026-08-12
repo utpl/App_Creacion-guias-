@@ -656,3 +656,69 @@ a.ed-boton {
   font-size: var(--ed-size-xs);
   color: var(--ed-text-muted);
 }
+
+/* ---------- Progreso ---------- */
+
+.ed-progreso { margin-bottom: var(--ed-space-6); max-width: 520px; }
+
+.ed-progreso__barra {
+  height: 8px;
+  background: var(--ed-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ed-progreso__relleno {
+  height: 100%;
+  background: var(--ed-success);
+  border-radius: 999px;
+  transition: width .3s ease;
+}
+.ed-progreso__texto {
+  margin: var(--ed-space-2) 0 0;
+  font-size: var(--ed-size-sm);
+  color: var(--ed-text-muted);
+}
+
+/* ---------- Semanas ---------- */
+
+.ed-semanas { display: flex; flex-direction: column; gap: var(--ed-space-2); }
+
+.ed-semana {
+  display: flex;
+  align-items: center;
+  gap: var(--ed-space-4);
+  background: var(--ed-surface);
+  border: 1px solid var(--ed-border);
+  border-radius: var(--ed-radius);
+  padding: var(--ed-space-4);
+}
+
+.ed-semana__numero {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ed-primary-soft);
+  color: var(--ed-primary);
+  font-weight: 700;
+  font-size: var(--ed-size-sm);
+}
+
+.ed-semana__cuerpo { flex: 1; min-width: 0; }
+
+.ed-semana__tema {
+  margin: 0 0 var(--ed-space-2);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.ed-semana__meta { margin: 0; }
+
+.ed-semana__accion { flex-shrink: 0; }
+
+@media (max-width: 640px) {
+  .ed-semana { flex-wrap: wrap; }
+  .ed-semana__accion { width: 100%; }
+}

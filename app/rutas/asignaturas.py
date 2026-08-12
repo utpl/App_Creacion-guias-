@@ -268,3 +268,113 @@ def eliminar_matriz(
     return RedirectResponse(
         url=f"/asignaturas/{asignatura.codigo}/matriz", status_code=303
     )
+
+
+@enrutador.post("/asignaturas/{codigo}/guia/iniciar",
+                dependencies=[Depends(exigir_csrf)])
+def iniciar_guia(
+    request: Request,
+    codigo: str,
+    usuario: Usuario = Depends(exigir_roles("PROFESOR")),
+    bd: Session = Depends(obtener_sesion),
+):
+    from fastapi import HTTPException
+    from app.modelos import Guia, MatrizPlanificacion, SemanaGuia
+    from app.seguridad import auditoria
+
+    periodo = _periodo_activo(bd)
+    asignatura = _asignacion_o_403(bd, usuario, codigo, periodo)
+
+    matriz = bd.scalar(
+        select(MatrizPlanificacion).where(
+            MatrizPlanificacion.asignatura_id == asignatura.id,
+            MatrizPlanificacion.periodo_id == periodo.id,
+        )
+    )
+    if matriz is None:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede iniciar la guía sin matriz de planificación.",
+        )
+
+    existente = bd.scalar(
+        select(Guia).where(
+            Guia.asignatura_id == asignatura.id,
+            Guia.periodo_id == periodo.id,
+        )
+    )
+    if existente is None:
+        guia = Guia(
+            asignatura_id=asignatura.id,
+            periodo_id=periodo.id,
+            matriz_id=matriz.id,
+            semanas_totales=matriz.semanas_totales,
+            estado="EN_EDICION",
+            creada_por_id=usuario.id,
+        )
+        bd.add(guia)
+        bd.flush()
+
+        for numero in range(1, matriz.semanas_totales + 1):
+            bd.add(SemanaGuia(guia_id=guia.id, numero=numero, estado="PENDIENTE"))
+
+        bd.commit()
+        auditoria.registrar(
+            bd, "guia.iniciada", actor_id=usuario.id,
+            tipo_entidad="asignatura", id_entidad=asignatura.codigo,
+            detalles={"semanas": matriz.semanas_totales}, request=request,
+        )
+
+    return RedirectResponse(
+        url=f"/asignaturas/{asignatura.codigo}/guia", status_code=303
+    )
+
+
+@enrutador.get("/asignaturas/{codigo}/guia", response_class=HTMLResponse)
+def ver_guia(
+    request: Request,
+    codigo: str,
+    usuario: Usuario = Depends(exigir_roles("PROFESOR")),
+    bd: Session = Depends(obtener_sesion),
+):
+    from app.modelos import FilaMatriz, Guia, SemanaGuia
+
+    periodo = _periodo_activo(bd)
+    asignatura = _asignacion_o_403(bd, usuario, codigo, periodo)
+
+    guia = bd.scalar(
+        select(Guia).where(
+            Guia.asignatura_id == asignatura.id,
+            Guia.periodo_id == periodo.id,
+        )
+    )
+    if guia is None:
+        return RedirectResponse(
+            url=f"/asignaturas/{asignatura.codigo}/matriz", status_code=303
+        )
+
+    semanas = bd.scalars(
+        select(SemanaGuia)
+        .where(SemanaGuia.guia_id == guia.id)
+        .order_by(SemanaGuia.numero)
+    ).all()
+
+    filas = bd.scalars(
+        select(FilaMatriz).where(FilaMatriz.matriz_id == guia.matriz_id)
+    ).all()
+    temas = {f.semana: f.unidad_contenido for f in filas}
+
+    aprobadas = sum(1 for s in semanas if s.estado == "APROBADA")
+    porcentaje = round(aprobadas / guia.semanas_totales * 100) if guia.semanas_totales else 0
+
+    return plantillas.TemplateResponse(request, "guia.html", {
+        "usuario": usuario,
+        "navegacion": construir(usuario, "/asignaturas"),
+        "asignatura": asignatura,
+        "periodo": periodo,
+        "guia": guia,
+        "semanas": semanas,
+        "temas": temas,
+        "aprobadas": aprobadas,
+        "porcentaje": porcentaje,
+    })
