@@ -1,0 +1,53 @@
+{% extends "marco.html" %}
+{% block titulo %}Sesiones activas · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Sesiones activas</h1>
+
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);">
+  {{ sesiones|length }} sesión{{ 'es' if sesiones|length != 1 }} vigente{{ 's' if sesiones|length != 1 }}.
+</p>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Sesiones vigentes en el sistema</caption>
+  <thead>
+    <tr>
+      <th scope="col">Usuario</th>
+      <th scope="col">Origen</th>
+      <th scope="col">Inicio</th>
+      <th scope="col">Última actividad</th>
+      <th scope="col">Caduca</th>
+      <th scope="col"><span class="ed-saltar">Acciones</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sesiones %}
+    <tr>
+      <td>
+        {{ s.usuario.nombre_completo }}<br>
+        <span style="color:var(--ed-text-muted); font-size:var(--ed-size-xs);">
+          {{ s.usuario.correo }}
+        </span>
+      </td>
+      <td style="color:var(--ed-text-muted);">{{ s.ip or '—' }}</td>
+      <td>{{ s.emitida_en.strftime('%d/%m %H:%M') }}</td>
+      <td>{{ s.ultima_actividad.strftime('%d/%m %H:%M') }}</td>
+      <td>{{ s.expira_en.strftime('%d/%m %H:%M') }}</td>
+      <td>
+        <form method="post" action="/admin/sesiones/{{ s.id }}/revocar">
+          <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+          <button class="ed-boton ed-boton--contorno" type="submit"
+                  style="padding:var(--ed-space-1) var(--ed-space-3);">
+            Cerrar
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center; color:var(--ed-text-muted);">
+      No hay sesiones activas.
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

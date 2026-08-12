@@ -1,0 +1,66 @@
+{% extends "marco.html" %}
+{% block titulo %}Auditoría · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Auditoría</h1>
+
+<form method="get" action="/admin/auditoria"
+      style="display:flex; gap:var(--ed-space-3); margin-bottom:var(--ed-space-6);
+             flex-wrap:wrap; align-items:flex-end;">
+  <div style="min-width:220px;">
+    <label class="ed-etiqueta" for="accion">Acción</label>
+    <select class="ed-entrada" id="accion" name="accion">
+      <option value="">Todas</option>
+      {% for a in acciones %}
+      <option value="{{ a }}" {% if accion == a %}selected{% endif %}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="ed-boton ed-boton--primario" type="submit">Filtrar</button>
+</form>
+
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);">
+  {{ total }} registro{{ 's' if total != 1 }} · página {{ pagina }} de {{ paginas }}
+</p>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Registro de auditoría del sistema</caption>
+  <thead>
+    <tr>
+      <th scope="col">Fecha</th>
+      <th scope="col">Acción</th>
+      <th scope="col">Actor</th>
+      <th scope="col">Origen</th>
+      <th scope="col">Detalles</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in registros %}
+    <tr>
+      <td style="white-space:nowrap;">{{ r.ocurrido_en.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+      <td><code style="font-size:var(--ed-size-xs);">{{ r.accion }}</code></td>
+      <td>{{ nombres.get(r.actor_id, '—') }}</td>
+      <td style="color:var(--ed-text-muted);">{{ r.ip or '—' }}</td>
+      <td style="color:var(--ed-text-muted); font-size:var(--ed-size-xs);">
+        {{ r.detalles or '' }}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="text-align:center; color:var(--ed-text-muted);">
+      Sin registros.
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if paginas > 1 %}
+<div style="display:flex; gap:var(--ed-space-3); margin-top:var(--ed-space-4);">
+  {% if pagina > 1 %}
+  <a class="ed-boton ed-boton--contorno" href="?pagina={{ pagina - 1 }}&accion={{ accion or '' }}">Anterior</a>
+  {% endif %}
+  {% if pagina < paginas %}
+  <a class="ed-boton ed-boton--contorno" href="?pagina={{ pagina + 1 }}&accion={{ accion or '' }}">Siguiente</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
