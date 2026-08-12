@@ -1,0 +1,118 @@
+{% extends "marco.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Importar usuarios · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Importar usuarios</h1>
+
+{% if error_global %}
+<div class="ed-mensaje ed-mensaje--error" role="alert">
+  {{ icono.alerta() }}<span>{{ error_global }}</span>
+</div>
+{% endif %}
+
+{% if resumen %}
+<div class="ed-mensaje" role="status" style="background:var(--ed-success-soft); color:var(--ed-success);
+            border-left:3px solid var(--ed-success);">
+  <span>{{ resumen }}</span>
+</div>
+{% endif %}
+
+{% if not filas %}
+<div class="ed-tarjeta" style="max-width:560px;">
+  <p style="margin-top:0; font-size:var(--ed-size-sm);">
+    El archivo debe tener las columnas <strong>correo</strong>,
+    <strong>nombres</strong>, <strong>apellidos</strong> y, opcionalmente,
+    <strong>roles</strong> separados por comas.
+  </p>
+  <p style="font-size:var(--ed-size-sm); color:var(--ed-text-muted);">
+    Las cuentas se crean sin contraseña. Cada persona recibe un enlace de
+    activación en su correo institucional.
+  </p>
+
+  <form method="post" action="/admin/usuarios/importar" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <div class="ed-campo">
+      <label class="ed-etiqueta" for="archivo">Archivo (.csv o .xlsx)</label>
+      <input class="ed-entrada" type="file" id="archivo" name="archivo" accept=".csv,.xlsx,.xlsm" required>
+    </div>
+    <button class="ed-boton ed-boton--primario" type="submit">
+      Analizar archivo
+    </button>
+  </form>
+</div>
+
+{% else %}
+
+<div style="display:flex; gap:var(--ed-space-4); margin-bottom:var(--ed-space-6);">
+  <div class="ed-tarjeta" style="flex:1; padding:var(--ed-space-4);">
+    <p style="margin:0; font-size:var(--ed-size-xs); color:var(--ed-text-muted);">
+      Listas para crear</p>
+    <p style="margin:0; font-size:var(--ed-size-xl); font-weight:700;
+              color:var(--ed-success);">{{ validas }}</p>
+  </div>
+  <div class="ed-tarjeta" style="flex:1; padding:var(--ed-space-4);">
+    <p style="margin:0; font-size:var(--ed-size-xs); color:var(--ed-text-muted);">
+      Con errores</p>
+    <p style="margin:0; font-size:var(--ed-size-xl); font-weight:700;
+              color:var(--ed-danger);">{{ invalidas }}</p>
+  </div>
+</div>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Vista previa de la importación</caption>
+  <thead>
+    <tr>
+      <th scope="col">Fila</th>
+      <th scope="col">Correo</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Roles</th>
+      <th scope="col">Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in filas %}
+    <tr>
+      <td>{{ f.numero }}</td>
+      <td>{{ f.datos.correo or '—' }}</td>
+      <td>{{ f.datos.nombres }} {{ f.datos.apellidos }}</td>
+      <td style="font-size:var(--ed-size-xs);">{{ f.datos.roles_procesados or '—' }}</td>
+      <td>
+        {% if f.valida %}
+        <span class="ed-distintivo ed-distintivo--exito">Válida</span>
+        {% for a in f.avisos %}
+        <span style="display:block; font-size:var(--ed-size-xs);
+                     color:var(--ed-text-muted);">{{ a }}</span>
+        {% endfor %}
+        {% else %}
+        {% for e in f.errores %}
+        <span style="display:block; font-size:var(--ed-size-xs);
+                     color:var(--ed-danger);">{{ e }}</span>
+        {% endfor %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div style="display:flex; gap:var(--ed-space-3); margin-top:var(--ed-space-6);">
+  {% if validas > 0 %}
+  <form method="post" action="/admin/usuarios/importar/confirmar">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <input type="hidden" name="datos" value="{{ datos_serializados }}">
+    <button class="ed-boton ed-boton--primario" type="submit">
+      Crear {{ validas }} usuario{{ 's' if validas != 1 }}
+    </button>
+  </form>
+  {% endif %}
+  <a class="ed-boton ed-boton--contorno" href="/admin/usuarios/importar">Cancelar</a>
+</div>
+
+<p style="margin-top:var(--ed-space-4); font-size:var(--ed-size-sm);
+          color:var(--ed-text-muted);">
+  Solo se crearán las filas válidas. Las que tienen errores se omiten.
+</p>
+
+{% endif %}
+{% endblock %}
