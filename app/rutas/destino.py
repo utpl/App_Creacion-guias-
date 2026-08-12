@@ -9,7 +9,7 @@ DESTINOS = [
     ("ADMIN_EDILOJA", "/inicio"),
     ("OPERATIVO",     "/inicio"),
     ("QA",            "/inicio"),
-    ("PROFESOR",      "/inicio"),
+    ("PROFESOR",      "/asignaturas"),
 ]
 
 

@@ -1,0 +1,58 @@
+{% extends "marco.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Mis asignaturas · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Mis asignaturas</h1>
+
+{% if periodo %}
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);
+          margin-top:calc(var(--ed-space-6) * -1); margin-bottom:var(--ed-space-6);">
+  Periodo {{ periodo.nombre }}
+</p>
+{% endif %}
+
+{% if not asignaciones %}
+<div class="ed-tarjeta" style="max-width:560px;">
+  <p style="margin:0; color:var(--ed-text-muted);">
+    No tiene asignaturas registradas en el periodo activo.
+    Si cree que es un error, comuníquese con la coordinación académica.
+  </p>
+</div>
+{% else %}
+
+<div class="ed-rejilla">
+  {% for a in asignaciones %}
+  <article class="ed-asignatura">
+    <div class="ed-asignatura__cabecera">
+      <span class="ed-asignatura__codigo">{{ a.asignatura.codigo }}</span>
+      {% if a.rol_en_asignatura == 'colaborador' %}
+      <span class="ed-distintivo ed-distintivo--info">Colaborador</span>
+      {% endif %}
+    </div>
+
+    <h2 class="ed-asignatura__nombre">{{ a.asignatura.nombre }}</h2>
+
+    <p class="ed-asignatura__meta">
+      {{ a.asignatura.carrera.nombre }}
+    </p>
+
+    {% if a.companeros %}
+    <p class="ed-asignatura__meta">
+      Con {{ a.companeros | join(', ') }}
+    </p>
+    {% endif %}
+
+    <div class="ed-asignatura__estado">
+      <span class="ed-distintivo ed-distintivo--aviso">Sin guía iniciada</span>
+    </div>
+
+    <p class="ed-asignatura__nota">
+      La generación de guías estará disponible próximamente.
+    </p>
+  </article>
+  {% endfor %}
+</div>
+
+{% endif %}
+{% endblock %}
