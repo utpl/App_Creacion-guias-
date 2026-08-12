@@ -1,6 +1,5 @@
 """Vista del docente: sus asignaturas del periodo activo."""
 
-"""Vista del docente: sus asignaturas del periodo activo."""
 
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -8,7 +7,9 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+
 from app.base_datos import obtener_sesion
+from app.modelos import Guia, MatrizPlanificacion, SemanaGuia
 from app.modelos import AsignacionDocente, PeriodoAcademico, Usuario
 from app.rutas.navegacion import construir
 from app.seguridad.csrf import exigir_csrf
@@ -36,7 +37,7 @@ def mis_asignaturas(
                 AsignacionDocente.docente_id == usuario.id,
                 AsignacionDocente.periodo_id == periodo.id,
             )
-        ).all()
+        ).unique().all()
 
         for asignacion in propias:
             otros = bd.scalars(
@@ -51,7 +52,38 @@ def mis_asignaturas(
                 persona = bd.get(Usuario, otro.docente_id)
                 if persona:
                     companeros.append(persona.nombre_completo)
+          
+           
+    
             asignacion.companeros = companeros  # type: ignore[misc]
+
+            matriz = bd.scalar(
+                select(MatrizPlanificacion).where(
+                    MatrizPlanificacion.asignatura_id == asignacion.asignatura_id,
+                    MatrizPlanificacion.periodo_id == periodo.id,
+                )
+            )
+            guia = bd.scalar(
+                select(Guia).where(
+                    Guia.asignatura_id == asignacion.asignatura_id,
+                    Guia.periodo_id == periodo.id,
+                )
+            )
+            asignacion.tiene_matriz = matriz is not None  # type: ignore[misc]
+            asignacion.guia = guia  # type: ignore[misc]
+            asignacion.aprobadas = 0  # type: ignore[misc]
+            asignacion.porcentaje = 0  # type: ignore[misc]
+
+            if guia:
+                lista = bd.scalars(
+                    select(SemanaGuia).where(SemanaGuia.guia_id == guia.id)
+                ).all()
+                aprobadas = sum(1 for s in lista if s.estado == "APROBADA")
+                asignacion.aprobadas = aprobadas  # type: ignore[misc]
+                asignacion.porcentaje = round(  # type: ignore[misc]
+                    aprobadas / guia.semanas_totales * 100
+                ) if guia.semanas_totales else 0
+
             asignaciones.append(asignacion)
 
         asignaciones.sort(key=lambda a: a.asignatura.codigo)

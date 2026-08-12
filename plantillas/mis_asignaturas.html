@@ -52,19 +52,35 @@
     </p>
     {% endif %}
 
+    {% if a.guia %}
+    <div class="ed-progreso" style="margin:var(--ed-space-2) 0;">
+      <div class="ed-progreso__barra">
+        <div class="ed-progreso__relleno" style="width: {{ a.porcentaje }}%;"></div>
+      </div>
+      <p class="ed-progreso__texto" style="font-size:var(--ed-size-xs);">
+        {{ a.aprobadas }} de {{ a.guia.semanas_totales }} semanas aprobadas
+      </p>
+    </div>
+    <p style="margin:var(--ed-space-2) 0 0;">
+      <a class="ed-boton ed-boton--accion" href="/asignaturas/{{ a.asignatura.codigo }}/guia">Continuar</a>
+    </p>
+
+    {% elif a.tiene_matriz %}
+    <div class="ed-asignatura__estado">
+      <span class="ed-distintivo ed-distintivo--info">Matriz cargada</span>
+    </div>
+    <p style="margin:var(--ed-space-2) 0 0;">
+      <a class="ed-boton ed-boton--accion" href="/asignaturas/{{ a.asignatura.codigo }}/matriz">Crear guía</a>
+    </p>
+
+    {% else %}
     <div class="ed-asignatura__estado">
       <span class="ed-distintivo ed-distintivo--aviso">Sin matriz</span>
     </div>
-
     <p style="margin:var(--ed-space-2) 0 0;">
-      <a class="ed-boton ed-boton--accion" href="/asignaturas/{{ a.asignatura.codigo }}/matriz">
-        Cargar matriz
-      </a>
+      <a class="ed-boton ed-boton--accion" href="/asignaturas/{{ a.asignatura.codigo }}/matriz">Cargar matriz</a>
     </p>
-
-    <p class="ed-asignatura__nota">
-      La generación de guías estará disponible próximamente.
-    </p>
+    {% endif %}
   </article>
   {% endfor %}
 </div>
