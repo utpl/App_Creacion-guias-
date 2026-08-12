@@ -3,6 +3,19 @@
 
 {% block panel %}
 <h1 class="ed-titulo-pagina">Usuarios</h1>
+{% if sin_titular %}
+<div class="ed-mensaje" role="alert" style="background:var(--ed-warning-soft); color:#7a5a00;
+            border-left:3px solid var(--ed-secondary); display:block;">
+  <strong>{{ sin_titular|length }} asignatura{{ 's' if sin_titular|length != 1 }}
+    sin docente titular</strong> en {{ periodo_activo.nombre }}.
+  Nadie puede generar su guía hasta resolverlo.
+  <ul style="margin:var(--ed-space-2) 0 0; padding-left:var(--ed-space-6);">
+    {% for a in sin_titular %}
+    <li>{{ a.codigo }} — {{ a.nombre }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
 <p style="margin-bottom:var(--ed-space-6);">
   <a class="ed-boton ed-boton--accion" href="/admin/usuarios/importar">
     Importar desde archivo

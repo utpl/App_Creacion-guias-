@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
-
+from app.modelos import AsignacionDocente, Asignatura, PeriodoAcademico
 from app.base_datos import obtener_sesion
 from app.configuracion import configuracion
 from app.modelos import Rol, Usuario, UsuarioRol
@@ -55,7 +55,23 @@ def listar_usuarios(
         .offset((pagina - 1) * POR_PAGINA)
         .limit(POR_PAGINA)
     ).unique().all()
+# Asignaturas del periodo activo que quedaron sin titular.
+   
 
+    periodo_activo = bd.scalar(
+        select(PeriodoAcademico).where(PeriodoAcademico.activo.is_(True))
+    )
+    sin_titular = []
+    if periodo_activo:
+        con_titular = select(AsignacionDocente.asignatura_id).where(
+            AsignacionDocente.periodo_id == periodo_activo.id,
+            AsignacionDocente.rol_en_asignatura == "titular",
+        )
+        sin_titular = bd.scalars(
+            select(Asignatura)
+            .where(Asignatura.id.not_in(con_titular))
+            .order_by(Asignatura.codigo)
+        ).all()
     return plantillas.TemplateResponse(request, "admin_usuarios.html", {
         "usuario": usuario,
         "navegacion": construir(usuario, "/admin/usuarios"),
@@ -66,6 +82,8 @@ def listar_usuarios(
         "total": total,
         "pagina": pagina,
         "paginas": paginas,
+        "sin_titular": sin_titular,
+        "periodo_activo": periodo_activo,
     })
 @enrutador.get("/sesiones", response_class=HTMLResponse)
 def listar_sesiones(
