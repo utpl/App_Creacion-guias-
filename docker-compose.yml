@@ -29,5 +29,15 @@ services:
       timeout: 3s
       retries: 10
 
+  correo:
+    image: axllent/mailpit:latest
+    container_name: ediloja-correo
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_MAX_MESSAGES: 500
+
 volumes:
   datos_postgres:

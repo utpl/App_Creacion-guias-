@@ -1,30 +1,45 @@
-"""Envio de correo. En desarrollo escribe a disco en vez de enviar."""
+"""Envio de correo por SMTP, encolado en segundo plano."""
 
-from datetime import datetime, timezone
-from pathlib import Path
+import smtplib
+from email.message import EmailMessage
 
 from app.configuracion import configuracion
 
-CARPETA_DESARROLLO = Path("correos_dev")
+
+def _enviar_ahora(destinatario: str, asunto: str, cuerpo: str) -> None:
+    """Envio sincrono. Lo ejecuta el worker, nunca la peticion HTTP."""
+    mensaje = EmailMessage()
+    mensaje["From"] = (
+        f"{configuracion.remitente_nombre} <{configuracion.remitente_correo}>"
+    )
+    mensaje["To"] = destinatario
+    mensaje["Subject"] = asunto
+    mensaje.set_content(cuerpo)
+
+    with smtplib.SMTP(configuracion.smtp_host, configuracion.smtp_puerto,
+                      timeout=15) as servidor:
+        if configuracion.smtp_tls:
+            servidor.starttls()
+        if configuracion.smtp_usuario and configuracion.smtp_password:
+            servidor.login(
+                configuracion.smtp_usuario,
+                configuracion.smtp_password.get_secret_value(),
+            )
+        servidor.send_message(mensaje)
 
 
 def enviar(destinatario: str, asunto: str, cuerpo: str) -> None:
-    """Envia un correo. En desarrollo lo guarda como archivo."""
-    if configuracion.entorno == "desarrollo":
-        CARPETA_DESARROLLO.mkdir(exist_ok=True)
-        marca = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-        archivo = CARPETA_DESARROLLO / f"{marca}-{destinatario}.txt"
-        archivo.write_text(
-            f"Para: {destinatario}\nAsunto: {asunto}\n\n{cuerpo}\n",
-            encoding="utf-8",
-        )
-        print(f"[correo guardado] {archivo}")
-        return
+    """Encola el envio. Si la cola falla, envia directo para no perderlo."""
+    try:
+        from redis import Redis
+        from rq import Queue
 
-    # En produccion se encolara en RQ y saldra por SES.
-    raise NotImplementedError(
-        "El envio real de correo se configura al desplegar."
-    )
+        cola = Queue("correo", connection=Redis.from_url(
+            str(configuracion.url_redis)
+        ))
+        cola.enqueue(_enviar_ahora, destinatario, asunto, cuerpo)
+    except Exception:
+        _enviar_ahora(destinatario, asunto, cuerpo)
 
 
 def enlace_recuperacion(url: str, nombre: str) -> tuple[str, str]:

@@ -16,6 +16,14 @@ class Configuracion(BaseSettings):
     url_redis: RedisDsn
     clave_secreta: SecretStr
     url_publica: str = "http://localhost:8000"
+    smtp_host: str = "localhost"
+    smtp_puerto: int = 1025
+    smtp_usuario: str = ""
+    smtp_password: SecretStr | None = None
+    smtp_tls: bool = False
+    remitente_correo: str = "no-responder@utpl.edu.ec"
+    remitente_nombre: str = "App-EdiLoja"
+  
 
     # Solo la usa docker-compose para crear la base en desarrollo.
     # Se declara para que extra="forbid" no la rechace.
