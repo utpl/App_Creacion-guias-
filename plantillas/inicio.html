@@ -25,6 +25,7 @@
     </p>
 
     <form method="post" action="/salir" style="margin-top:var(--ed-space-6);">
+      <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
       <button class="ed-boton ed-boton--contorno" type="submit">Cerrar sesión</button>
     </form>
 

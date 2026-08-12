@@ -13,10 +13,12 @@ from app.configuracion import configuracion
 from app.modelos import Usuario
 from app.seguridad import sesiones
 from app.seguridad.passwords import verificar
+from app.seguridad.csrf import exigir_csrf
 
 from app.seguridad.dependencias import usuario_actual
 
 enrutador = APIRouter()
+
 plantillas = Jinja2Templates(directory="plantillas")
 
 MENSAJE_CREDENCIALES = "Correo o contraseña incorrectos."
@@ -43,7 +45,7 @@ def mostrar_login(request: Request):
     )
 
 
-@enrutador.post("/ingresar")
+@enrutador.post("/ingresar", dependencies=[Depends(exigir_csrf)])
 def procesar_login(
     request: Request,
     correo: str = Form(...),
@@ -120,7 +122,7 @@ def procesar_login(
     return respuesta
 
 
-@enrutador.post("/salir")
+@enrutador.post("/salir", dependencies=[Depends(exigir_csrf)])
 def salir(request: Request, bd: Session = Depends(obtener_sesion)):
     token = request.cookies.get(sesiones.NOMBRE_COOKIE)
     if token:

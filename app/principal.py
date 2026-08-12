@@ -8,6 +8,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from fastapi.responses import RedirectResponse
 from app.seguridad.dependencias import RedireccionAlLogin
+from starlette.middleware.base import BaseHTTPMiddleware
+from app.seguridad import csrf
 
 
 
@@ -63,6 +65,33 @@ def manejar_sin_sesion(request, exc):
     return RedirectResponse(url="/ingresar", status_code=303) 
 
 
+class MiddlewareCSRF(BaseHTTPMiddleware):
+    """Emite el token CSRF en cada respuesta y lo deja disponible en la plantilla."""
+
+    async def dispatch(self, request, call_next):
+        token = request.cookies.get(csrf.NOMBRE_COOKIE_CSRF)
+        if not token or not csrf.es_valido(token):
+            token = csrf.generar()
+            nuevo = True
+        else:
+            nuevo = False
+
+        request.state.csrf_token = token
+        respuesta = await call_next(request)
+
+        if nuevo:
+            respuesta.set_cookie(
+                key=csrf.NOMBRE_COOKIE_CSRF,
+                value=token,
+                httponly=False,          # htmx debe poder leerlo
+                secure=configuracion.entorno != "desarrollo",
+                samesite="lax",
+                path="/",
+            )
+        return respuesta
+
+
+app.add_middleware(MiddlewareCSRF)
 
 app.mount("/estaticos", StaticFiles(directory="estaticos"), name="estaticos")
 app.include_router(autenticacion.enrutador)
