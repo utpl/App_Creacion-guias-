@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-
+from app.rutas import destino
 from app.base_datos import obtener_sesion
 from app.configuracion import configuracion
 from app.seguridad import auditoria, correo, recuperacion, sesiones
@@ -113,7 +113,7 @@ def procesar_restablecer(
         ip=request.client.host if request.client else None,
         agente_usuario=request.headers.get("user-agent"),
     )
-    respuesta = RedirectResponse(url="/inicio", status_code=303)
+    respuesta = RedirectResponse(url=destino.para(usuario), status_code=303)
     respuesta.set_cookie(
         key=sesiones.NOMBRE_COOKIE,
         value=nuevo,

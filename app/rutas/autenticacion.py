@@ -15,6 +15,7 @@ from app.seguridad import sesiones
 from app.seguridad.passwords import verificar
 from app.seguridad.csrf import exigir_csrf
 from app.seguridad import auditoria
+from app.rutas import destino
 
 from app.seguridad.dependencias import usuario_actual
 
@@ -139,7 +140,7 @@ def procesar_login(
         bd, "ingreso.exitoso", actor_id=usuario.id, request=request,
     )
 
-    respuesta = RedirectResponse(url="/inicio", status_code=303)
+    respuesta = RedirectResponse(url=destino.para(usuario), status_code=303)
     respuesta.set_cookie(
         key=sesiones.NOMBRE_COOKIE,
         value=token,
