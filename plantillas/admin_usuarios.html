@@ -1,0 +1,100 @@
+{% extends "marco.html" %}
+{% block titulo %}Usuarios · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Usuarios</h1>
+
+<form method="get" action="/admin/usuarios"
+      style="display:flex; gap:var(--ed-space-3); margin-bottom:var(--ed-space-6);
+             flex-wrap:wrap; align-items:flex-end;">
+
+  <div style="flex:1; min-width:220px;">
+    <label class="ed-etiqueta" for="busqueda">Buscar</label>
+    <input class="ed-entrada" type="search" id="busqueda" name="busqueda"
+           value="{{ busqueda or '' }}" placeholder="Nombre o correo">
+  </div>
+
+  <div style="min-width:170px;">
+    <label class="ed-etiqueta" for="rol">Rol</label>
+    <select class="ed-entrada" id="rol" name="rol">
+      <option value="">Todos</option>
+      {% for r in roles %}
+      <option value="{{ r.codigo }}" {% if rol == r.codigo %}selected{% endif %}>
+        {{ r.codigo }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button class="ed-boton ed-boton--primario" type="submit">Filtrar</button>
+</form>
+
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);">
+  {{ total }} usuario{{ 's' if total != 1 }} · página {{ pagina }} de {{ paginas }}
+</p>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Listado de usuarios del sistema</caption>
+  <thead>
+    <tr>
+      <th scope="col">Nombre</th>
+      <th scope="col">Correo</th>
+      <th scope="col">Roles</th>
+      <th scope="col">Origen</th>
+      <th scope="col">Estado</th>
+      <th scope="col">Último acceso</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.nombre_completo }}</td>
+      <td>{{ u.correo }}</td>
+      <td>
+        {% for v in u.roles %}
+        <span class="ed-distintivo ed-distintivo--info">{{ v.rol.codigo }}</span>
+        {% endfor %}
+      </td>
+      <td>
+        {% if u.origen == 'INVITADO' %}
+        <span class="ed-distintivo ed-distintivo--aviso">Invitado</span>
+        {% else %}
+        <span style="color:var(--ed-text-muted);">Nómina</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if u.estado == 'ACTIVO' %}
+        <span class="ed-distintivo ed-distintivo--exito">Activo</span>
+        {% else %}
+        <span class="ed-distintivo ed-distintivo--peligro">{{ u.estado|title }}</span>
+        {% endif %}
+      </td>
+      <td style="color:var(--ed-text-muted);">
+        {{ u.ultimo_acceso.strftime('%d/%m/%Y %H:%M') if u.ultimo_acceso else '—' }}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center; color:var(--ed-text-muted);">
+      No hay usuarios que coincidan.
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if paginas > 1 %}
+<div style="display:flex; gap:var(--ed-space-3); margin-top:var(--ed-space-4);">
+  {% if pagina > 1 %}
+  <a class="ed-boton ed-boton--contorno"
+     href="?pagina={{ pagina - 1 }}&busqueda={{ busqueda or '' }}&rol={{ rol or '' }}">
+    Anterior
+  </a>
+  {% endif %}
+  {% if pagina < paginas %}
+  <a class="ed-boton ed-boton--contorno"
+     href="?pagina={{ pagina + 1 }}&busqueda={{ busqueda or '' }}&rol={{ rol or '' }}">
+    Siguiente
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

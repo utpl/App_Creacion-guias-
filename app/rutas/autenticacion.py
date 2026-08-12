@@ -168,4 +168,8 @@ def salir(request: Request, bd: Session = Depends(obtener_sesion)):
 
 @enrutador.get("/inicio", response_class=HTMLResponse)
 def inicio(request: Request, usuario: Usuario = Depends(usuario_actual)):
-    return plantillas.TemplateResponse(request, "inicio.html", {"usuario": usuario})
+    from app.rutas.navegacion import construir
+    return plantillas.TemplateResponse(request, "inicio.html", {
+        "usuario": usuario,
+        "navegacion": construir(usuario, "/inicio"),
+    })

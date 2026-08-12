@@ -10,6 +10,7 @@ from fastapi.responses import RedirectResponse
 from app.seguridad.dependencias import RedireccionAlLogin
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.seguridad import csrf
+from app.rutas import administracion, autenticacion, recuperacion
 
 from app.rutas import autenticacion, recuperacion
 
@@ -96,3 +97,4 @@ app.add_middleware(MiddlewareCSRF)
 app.mount("/estaticos", StaticFiles(directory="estaticos"), name="estaticos")
 app.include_router(autenticacion.enrutador)
 app.include_router(recuperacion.enrutador)
+app.include_router(administracion.enrutador)

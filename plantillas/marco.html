@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "iconos.html" as icono %}
+
+{% block cuerpo %}
+<div class="ed-app">
+
+  <aside class="ed-lateral">
+    <div class="ed-lateral__marca">
+      {{ icono.escudo() }}
+      <span>App-EdiLoja</span>
+    </div>
+
+    <nav class="ed-nav" aria-label="Navegación principal">
+      {% for elemento in navegacion %}
+      <a class="ed-nav__enlace {% if elemento.activo %}ed-nav__enlace--activo{% endif %}"
+         href="{{ elemento.url }}"
+         {% if elemento.activo %}aria-current="page"{% endif %}>
+        {{ elemento.texto }}
+      </a>
+      {% endfor %}
+    </nav>
+
+    <div class="ed-lateral__pie">
+      <p class="ed-lateral__usuario">{{ usuario.nombre_completo }}</p>
+      <p class="ed-lateral__correo">{{ usuario.correo }}</p>
+      <form method="post" action="/salir">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <button class="ed-boton ed-boton--contorno" type="submit"
+                style="width:100%; margin-top:var(--ed-space-3);">
+          Cerrar sesión
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main id="contenido" class="ed-principal">
+    {% block panel %}{% endblock %}
+  </main>
+
+</div>
+{% endblock %}
