@@ -1,0 +1,256 @@
+/* ==========================================================
+   Sistema visual App-EdiLoja
+   Fuente unica de verdad. Los componentes NUNCA usan hex.
+   ========================================================== */
+
+:root {
+  /* Identidad institucional */
+  --ed-primary: #003f72;
+  --ed-text: #273540;
+  --ed-link: #0e68b3;
+  --ed-secondary: #eaab00;
+  --ed-white: #ffffff;
+
+  /* Derivados de la identidad */
+  --ed-primary-hover: #002d52;
+  --ed-primary-soft: #e8f0f7;
+  --ed-secondary-soft: #fdf6e3;
+
+  /* Neutros */
+  --ed-surface: #ffffff;
+  --ed-bg: #f7f9fb;
+  --ed-border: #e3e8ee;
+  --ed-text-muted: #5b6b7a;
+
+  /* Estados */
+  --ed-success: #1a7f5a;
+  --ed-success-soft: #e6f4ef;
+  --ed-warning: var(--ed-secondary);
+  --ed-warning-soft: var(--ed-secondary-soft);
+  --ed-danger: #b42318;
+  --ed-danger-soft: #fdeceb;
+
+  /* Tipografia */
+  --ed-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ed-size-xs: 0.75rem;
+  --ed-size-sm: 0.875rem;
+  --ed-size-base: 1rem;
+  --ed-size-lg: 1.125rem;
+  --ed-size-xl: 1.5rem;
+  --ed-size-2xl: 2rem;
+
+  /* Espaciado */
+  --ed-space-1: 0.25rem;
+  --ed-space-2: 0.5rem;
+  --ed-space-3: 0.75rem;
+  --ed-space-4: 1rem;
+  --ed-space-6: 1.5rem;
+  --ed-space-8: 2rem;
+
+  /* Radios y sombras */
+  --ed-radius-sm: 6px;
+  --ed-radius: 10px;
+  --ed-radius-lg: 14px;
+  --ed-shadow-sm: 0 1px 2px rgba(39, 53, 64, 0.05);
+  --ed-shadow: 0 1px 3px rgba(39, 53, 64, 0.08),
+               0 1px 2px rgba(39, 53, 64, 0.04);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--ed-font);
+  font-size: var(--ed-size-base);
+  line-height: 1.55;
+  color: var(--ed-text);
+  background: var(--ed-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Accesibilidad ---------- */
+
+.ed-saltar {
+  position: absolute;
+  left: -9999px;
+}
+.ed-saltar:focus {
+  left: var(--ed-space-4);
+  top: var(--ed-space-4);
+  z-index: 100;
+  background: var(--ed-white);
+  padding: var(--ed-space-3) var(--ed-space-4);
+  border-radius: var(--ed-radius-sm);
+  box-shadow: var(--ed-shadow);
+}
+
+:focus-visible {
+  outline: 3px solid var(--ed-link);
+  outline-offset: 2px;
+  border-radius: var(--ed-radius-sm);
+}
+
+/* ---------- Botones ---------- */
+
+.ed-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ed-space-2);
+  padding: var(--ed-space-3) var(--ed-space-6);
+  border: 1px solid transparent;
+  border-radius: var(--ed-radius-sm);
+  font-family: inherit;
+  font-size: var(--ed-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ed-boton--primario {
+  background: var(--ed-primary);
+  color: var(--ed-white);
+}
+.ed-boton--primario:hover { background: var(--ed-primary-hover); }
+
+/* Texto oscuro sobre amarillo: blanco no alcanza el contraste AA. */
+.ed-boton--secundario {
+  background: var(--ed-secondary);
+  color: var(--ed-text);
+}
+
+.ed-boton--contorno {
+  background: transparent;
+  border-color: var(--ed-border);
+  color: var(--ed-text);
+}
+.ed-boton--contorno:hover { background: var(--ed-bg); }
+
+.ed-boton--bloque { width: 100%; }
+
+/* ---------- Formularios ---------- */
+
+.ed-campo { margin-bottom: var(--ed-space-4); }
+
+.ed-etiqueta {
+  display: block;
+  margin-bottom: var(--ed-space-2);
+  font-size: var(--ed-size-sm);
+  font-weight: 600;
+}
+
+.ed-entrada {
+  width: 100%;
+  padding: var(--ed-space-3);
+  border: 1px solid var(--ed-border);
+  border-radius: var(--ed-radius-sm);
+  font-family: inherit;
+  font-size: var(--ed-size-base);
+  color: var(--ed-text);
+  background: var(--ed-white);
+}
+.ed-entrada:focus { border-color: var(--ed-link); }
+
+/* ---------- Tarjetas ---------- */
+
+.ed-tarjeta {
+  background: var(--ed-surface);
+  border: 1px solid var(--ed-border);
+  border-radius: var(--ed-radius-lg);
+  box-shadow: var(--ed-shadow-sm);
+  padding: var(--ed-space-6);
+}
+
+/* ---------- Distintivos de estado ---------- */
+
+.ed-distintivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ed-space-1);
+  padding: var(--ed-space-1) var(--ed-space-3);
+  border-radius: 999px;
+  font-size: var(--ed-size-xs);
+  font-weight: 600;
+}
+.ed-distintivo--info    { background: var(--ed-primary-soft);   color: var(--ed-primary); }
+.ed-distintivo--exito   { background: var(--ed-success-soft);   color: var(--ed-success); }
+.ed-distintivo--aviso   { background: var(--ed-warning-soft);   color: #7a5a00; }
+.ed-distintivo--peligro { background: var(--ed-danger-soft);    color: var(--ed-danger); }
+
+/* ---------- Mensajes ---------- */
+
+.ed-mensaje {
+  display: flex;
+  gap: var(--ed-space-3);
+  padding: var(--ed-space-3) var(--ed-space-4);
+  border-radius: var(--ed-radius-sm);
+  font-size: var(--ed-size-sm);
+  margin-bottom: var(--ed-space-4);
+}
+.ed-mensaje--error {
+  background: var(--ed-danger-soft);
+  color: var(--ed-danger);
+  border-left: 3px solid var(--ed-danger);
+}
+
+/* ---------- Iconos ---------- */
+
+.ed-icono {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* ---------- Pantalla de acceso ---------- */
+
+.ed-acceso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--ed-space-4);
+}
+
+.ed-acceso__caja {
+  width: 100%;
+  max-width: 400px;
+  background: var(--ed-surface);
+  border: 1px solid var(--ed-border);
+  border-radius: var(--ed-radius-lg);
+  box-shadow: var(--ed-shadow);
+  padding: var(--ed-space-8);
+}
+
+.ed-acceso__marca {
+  display: flex;
+  align-items: center;
+  gap: var(--ed-space-3);
+  margin-bottom: var(--ed-space-6);
+}
+.ed-acceso__marca svg { width: 32px; height: 32px; color: var(--ed-primary); }
+
+.ed-acceso__titulo {
+  margin: 0;
+  font-size: var(--ed-size-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ed-primary);
+}
+.ed-acceso__subtitulo {
+  margin: 0;
+  font-size: var(--ed-size-sm);
+  color: var(--ed-text-muted);
+}
+
+.ed-acceso__pie {
+  margin-top: var(--ed-space-6);
+  text-align: center;
+  font-size: var(--ed-size-sm);
+}
+.ed-acceso__pie a { color: var(--ed-link); text-decoration: none; }
+.ed-acceso__pie a:hover { text-decoration: underline; }

@@ -2,6 +2,8 @@
 
 from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from app.rutas import autenticacion
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -51,3 +53,7 @@ def listo(bd: Session = Depends(obtener_sesion)) -> JSONResponse:
 @app.get("/version", tags=["sistema"])
 def version() -> dict[str, str]:
     return {"version": app.version, "entorno": configuracion.entorno}
+
+
+app.mount("/estaticos", StaticFiles(directory="estaticos"), name="estaticos")
+app.include_router(autenticacion.enrutador)

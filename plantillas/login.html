@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Iniciar sesión · App-EdiLoja{% endblock %}
+
+{% block cuerpo %}
+<main id="contenido" class="ed-acceso">
+  <div class="ed-acceso__caja">
+
+    <div class="ed-acceso__marca">
+      {{ icono.escudo() }}
+      <div>
+        <h1 class="ed-acceso__titulo">EdiLoja</h1>
+        <p class="ed-acceso__subtitulo">Plataforma Académica Digital para la Creación de Guías Didácticas</p>
+      </div>
+    </div>
+
+    {% if error %}
+    <div class="ed-mensaje ed-mensaje--error" role="alert">
+      {{ icono.alerta() }}
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/ingresar">
+      <div class="ed-campo">
+        <label class="ed-etiqueta" for="correo">Correo institucional</label>
+        <input class="ed-entrada" type="email" id="correo" name="correo" required autocomplete="username" autofocus
+          placeholder="nombre@utpl.edu.ec" value="{{ correo or '' }}">
+      </div>
+
+      <div class="ed-campo">
+        <label class="ed-etiqueta" for="password">Contraseña</label>
+        <input class="ed-entrada" type="password" id="password" name="password" required
+          autocomplete="current-password">
+      </div>
+
+      <button class="ed-boton ed-boton--primario ed-boton--bloque" type="submit">
+        Ingresar
+      </button>
+    </form>
+
+    <p class="ed-acceso__pie">
+      <a href="/recuperar">¿Olvidó su contraseña?</a>
+    </p>
+
+  </div>
+</main>
+{% endblock %}
