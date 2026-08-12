@@ -14,6 +14,8 @@ from app.modelos import Usuario
 from app.seguridad import sesiones
 from app.seguridad.passwords import verificar
 
+from app.seguridad.dependencias import usuario_actual
+
 enrutador = APIRouter()
 plantillas = Jinja2Templates(directory="plantillas")
 
@@ -126,3 +128,7 @@ def salir(request: Request, bd: Session = Depends(obtener_sesion)):
     respuesta = RedirectResponse(url="/ingresar", status_code=303)
     respuesta.delete_cookie(sesiones.NOMBRE_COOKIE, path="/")
     return respuesta
+
+@enrutador.get("/inicio", response_class=HTMLResponse)
+def inicio(request: Request, usuario: Usuario = Depends(usuario_actual)):
+    return plantillas.TemplateResponse(request, "inicio.html", {"usuario": usuario})

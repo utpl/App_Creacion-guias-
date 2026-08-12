@@ -10,7 +10,12 @@ from sqlalchemy.orm import Session as SesionBD
 from app.configuracion import configuracion
 from app.modelos import Sesion, Usuario
 
-NOMBRE_COOKIE = "__Host-ediloja_sesion"
+# El prefijo __Host- exige el atributo Secure, que no existe sin HTTPS.
+NOMBRE_COOKIE = (
+    "ediloja_sesion"
+    if configuracion.entorno == "desarrollo"
+    else "__Host-ediloja_sesion"
+)
 
 
 def _ahora() -> datetime:

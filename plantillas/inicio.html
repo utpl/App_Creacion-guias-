@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Inicio · App-EdiLoja{% endblock %}
+
+{% block cuerpo %}
+<main id="contenido" class="ed-acceso">
+  <div class="ed-tarjeta" style="max-width: 480px; width: 100%;">
+
+    <h1 style="margin-top:0; font-size:var(--ed-size-xl); color:var(--ed-primary);">
+      Hola, {{ usuario.nombres }}
+    </h1>
+    <p style="color:var(--ed-text-muted); margin-top:0;">{{ usuario.correo }}</p>
+
+    <p style="font-size:var(--ed-size-sm); margin-bottom:var(--ed-space-2);">
+      <strong>Roles asignados</strong>
+    </p>
+    <p>
+      {% for vinculo in usuario.roles %}
+      <span class="ed-distintivo ed-distintivo--info">{{ vinculo.rol.codigo }}</span>
+      {% endfor %}
+    </p>
+
+    <p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);">
+      Su área de trabajo estará disponible próximamente.
+    </p>
+
+    <form method="post" action="/salir" style="margin-top:var(--ed-space-6);">
+      <button class="ed-boton ed-boton--contorno" type="submit">Cerrar sesión</button>
+    </form>
+
+  </div>
+</main>
+{% endblock %}

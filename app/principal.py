@@ -6,6 +6,10 @@ from fastapi.staticfiles import StaticFiles
 from app.rutas import autenticacion
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from fastapi.responses import RedirectResponse
+from app.seguridad.dependencias import RedireccionAlLogin
+
+
 
 from app.base_datos import obtener_sesion
 from app.configuracion import configuracion
@@ -53,6 +57,11 @@ def listo(bd: Session = Depends(obtener_sesion)) -> JSONResponse:
 @app.get("/version", tags=["sistema"])
 def version() -> dict[str, str]:
     return {"version": app.version, "entorno": configuracion.entorno}
+
+@app.exception_handler(RedireccionAlLogin)
+def manejar_sin_sesion(request, exc):
+    return RedirectResponse(url="/ingresar", status_code=303) 
+
 
 
 app.mount("/estaticos", StaticFiles(directory="estaticos"), name="estaticos")
