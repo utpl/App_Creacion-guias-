@@ -73,3 +73,31 @@ class UsuarioRol(Base):
 
     usuario: Mapped["Usuario"] = relationship(back_populates="roles")
     rol: Mapped["Rol"] = relationship()
+
+class Sesion(Base):
+    __tablename__ = "sesion"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    usuario_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("usuario.id"), index=True
+    )
+    hash_token: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+
+    emitida_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ultima_actividad: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    ip: Mapped[str | None] = mapped_column(String(45), default=None)
+    agente_usuario: Mapped[str | None] = mapped_column(String(255), default=None)
+
+    revocada_en: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
+
+    usuario: Mapped["Usuario"] = relationship()
