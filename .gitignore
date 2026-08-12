@@ -5,3 +5,5 @@ __pycache__/
 *.sqlite3
 .pytest_cache/
 correos_dev/
+datos_ejemplo/*.xlsx
+datos_ejemplo/*.csv
