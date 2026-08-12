@@ -8,6 +8,9 @@ import sys
 import unicodedata
 
 from openpyxl import load_workbook
+import re
+import sys
+import unicodedata
 
 from app.base_datos import FabricaSesion
 from app.modelos import Asignatura, Carrera, Facultad
@@ -52,7 +55,25 @@ def _titulo(texto: str) -> str:
         for i, p in enumerate(palabras)
     )
 
+def _parsear_horas(texto: str) -> dict[str, int | None]:
+    """Extrae los numeros de 'Total:144  ACD:48 APE:32 AA:64'."""
+   
 
+   
+    resultado: dict[str, int | None] = {
+        "total": None, "acd": None, "ape": None, "aa": None
+    }
+    for clave, patron in [
+        ("total", r"total\s*:?\s*(\d+)"),
+        ("acd", r"acd\s*:?\s*(\d+)"),
+        ("ape", r"ape\s*:?\s*(\d+)"),
+        ("aa", r"\baa\s*:?\s*(\d+)"),
+    ]:
+        encontrado = re.search(patron, texto, re.IGNORECASE)
+        if encontrado:
+            resultado[clave] = int(encontrado.group(1))
+    return resultado
+    
 def importar(ruta: str) -> None:
     libro = load_workbook(ruta, read_only=True, data_only=True)
     hoja = libro[libro.sheetnames[0]]
@@ -138,6 +159,17 @@ def importar(ruta: str) -> None:
             except ValueError:
                 creditos = None
 
+            horas_crudo = valor(fila, "Horas")
+            horas = _parsear_horas(horas_crudo)
+
+            carreras_crudo = valor(fila, "Nº de carreras para las que se oferta")
+            try:
+                carreras_oferta = int(float(carreras_crudo)) if carreras_crudo else None
+            except ValueError:
+                carreras_oferta = None
+
+            origen = valor(fila, "Carrera de la que nace la asignatura")
+
             bd.add(Asignatura(
                 codigo=codigo,
                 nombre=valor(fila, "Nombre de Asignatura"),
@@ -146,6 +178,15 @@ def importar(ruta: str) -> None:
                 ciclo=valor(fila, "Ciclo único") or valor(fila, "Ciclos") or None,
                 campo_formacion=campo,
                 url_canvas=valor(fila, "URL CANVAS") or None,
+                horas_texto=horas_crudo or None,
+                horas_total=horas["total"],
+                horas_acd=horas["acd"],
+                horas_ape=horas["ape"],
+                horas_aa=horas["aa"],
+                tipo_plantilla=valor(fila, "Tipo plantilla") or None,
+                propia_de_carrera=valor(fila, "Propia de la carrera") or None,
+                carreras_oferta=carreras_oferta,
+                carrera_origen=origen.split("\n")[0].strip() or None,
             ))
             nuevas_asignaturas += 1
 

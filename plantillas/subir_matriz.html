@@ -12,7 +12,17 @@
   {{ asignatura.nombre }}
 </h1>
 <p style="color:var(--ed-text-muted); margin:0 0 var(--ed-space-6);">
-  {{ asignatura.codigo }} · {{ periodo.nombre }}
+  {{ asignatura.codigo }} · {{ periodo.nombre }}<br>
+  {{ asignatura.carrera.nombre }} ·
+  {{ asignatura.carrera.facultad.nombre }}
+  {% if asignatura.carrera.departamento %}
+  <br>Departamento de {{ asignatura.carrera.departamento }}
+  {% endif %}
+  {% if asignatura.ciclo or asignatura.creditos %}
+  <br>
+  {% if asignatura.ciclo %}Ciclo {{ asignatura.ciclo }}{% endif %}
+  {% if asignatura.creditos %} · {{ asignatura.creditos }} créditos{% endif %}
+  {% endif %}
 </p>
 
 {% if errores %}
@@ -25,16 +35,14 @@
 {% endif %}
 
 {% if avisos %}
-<div class="ed-mensaje" role="status"
-     style="background:var(--ed-warning-soft); color:#7a5a00;
+<div class="ed-mensaje" role="status" style="background:var(--ed-warning-soft); color:#7a5a00;
             border-left:3px solid var(--ed-secondary); display:block;">
   {% for a in avisos %}<div>{{ a }}</div>{% endfor %}
 </div>
 {% endif %}
 
 {% if matriz %}
-<div class="ed-mensaje" role="status"
-     style="background:var(--ed-success-soft); color:var(--ed-success);
+<div class="ed-mensaje" role="status" style="background:var(--ed-success-soft); color:var(--ed-success);
             border-left:3px solid var(--ed-success); display:block;">
   <strong>Matriz cargada</strong> — {{ matriz.semanas_totales }} semanas ·
   {{ matriz.nombre_archivo }}
@@ -79,8 +87,7 @@
     se reproduce literalmente y en orden, sin agregar ni deducir nada.
   </p>
 
-  <form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz"
-        enctype="multipart/form-data">
+  <form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
 
     <div class="ed-campo">
@@ -93,8 +100,7 @@
 
     <div class="ed-campo">
       <label class="ed-etiqueta" for="archivo">Archivo (.xlsx o .csv)</label>
-      <input class="ed-entrada" type="file" id="archivo" name="archivo"
-             accept=".xlsx,.xlsm,.csv" required>
+      <input class="ed-entrada" type="file" id="archivo" name="archivo" accept=".xlsx,.xlsm,.csv" required>
     </div>
 
     <button class="ed-boton ed-boton--primario" type="submit">

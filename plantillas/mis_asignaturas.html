@@ -34,7 +34,16 @@
     <h2 class="ed-asignatura__nombre">{{ a.asignatura.nombre }}</h2>
 
     <p class="ed-asignatura__meta">
-      {{ a.asignatura.carrera.nombre }}
+      {{ a.asignatura.carrera.nombre }}<br>
+      <span style="font-size:var(--ed-size-xs);">
+        {{ a.asignatura.carrera.facultad.nombre }}
+      </span>
+    </p>
+
+    <p class="ed-asignatura__meta" style="font-size:var(--ed-size-xs);">
+      {% if a.asignatura.ciclo %}Ciclo {{ a.asignatura.ciclo }}{% endif %}
+      {% if a.asignatura.creditos %} · {{ a.asignatura.creditos }} créditos{% endif %}
+      {% if a.asignatura.campo_formacion %} · {{ a.asignatura.campo_formacion }}{% endif %}
     </p>
 
     {% if a.companeros %}

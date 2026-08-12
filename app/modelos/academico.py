@@ -53,6 +53,17 @@ class Asignatura(Base):
     ciclo: Mapped[str | None] = mapped_column(String(20), default=None)
     campo_formacion: Mapped[str | None] = mapped_column(String(120), default=None)
     url_canvas: Mapped[str | None] = mapped_column(String(500), default=None)
+    # Horas academicas. Se usaran en el metacurso.
+    horas_texto: Mapped[str | None] = mapped_column(String(200), default=None)
+    horas_total: Mapped[int | None] = mapped_column(Integer, default=None)
+    horas_acd: Mapped[int | None] = mapped_column(Integer, default=None)
+    horas_ape: Mapped[int | None] = mapped_column(Integer, default=None)
+    horas_aa: Mapped[int | None] = mapped_column(Integer, default=None)
+
+    tipo_plantilla: Mapped[str | None] = mapped_column(String(60), default=None)
+    propia_de_carrera: Mapped[str | None] = mapped_column(String(20), default=None)
+    carreras_oferta: Mapped[int | None] = mapped_column(Integer, default=None)
+    carrera_origen: Mapped[str | None] = mapped_column(String(200), default=None)
 
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
