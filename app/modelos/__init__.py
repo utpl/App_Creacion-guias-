@@ -1,3 +1,10 @@
+from app.modelos.academico import (
+    AsignacionDocente,
+    Asignatura,
+    Carrera,
+    Facultad,
+    PeriodoAcademico,
+)
 from app.modelos.identidad import (
     RegistroAuditoria,
     Rol,
@@ -8,6 +15,7 @@ from app.modelos.identidad import (
 )
 
 __all__ = [
-    "RegistroAuditoria", "Rol", "Sesion",
+    "AsignacionDocente", "Asignatura", "Carrera", "Facultad",
+    "PeriodoAcademico", "RegistroAuditoria", "Rol", "Sesion",
     "TokenRecuperacion", "Usuario", "UsuarioRol",
 ]
