@@ -44,8 +44,14 @@
     {% endif %}
 
     <div class="ed-asignatura__estado">
-      <span class="ed-distintivo ed-distintivo--aviso">Sin guía iniciada</span>
+      <span class="ed-distintivo ed-distintivo--aviso">Sin matriz</span>
     </div>
+
+    <p style="margin:var(--ed-space-2) 0 0;">
+      <a class="ed-boton ed-boton--accion" href="/asignaturas/{{ a.asignatura.codigo }}/matriz">
+        Cargar matriz
+      </a>
+    </p>
 
     <p class="ed-asignatura__nota">
       La generación de guías estará disponible próximamente.

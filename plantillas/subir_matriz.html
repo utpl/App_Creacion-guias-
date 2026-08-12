@@ -1,0 +1,107 @@
+{% extends "marco.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Matriz · {{ asignatura.codigo }} · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<p style="margin:0 0 var(--ed-space-2);">
+  <a href="/asignaturas" style="color:var(--ed-link); font-size:var(--ed-size-sm);
+     text-decoration:none;">← Mis asignaturas</a>
+</p>
+
+<h1 class="ed-titulo-pagina" style="margin-bottom:var(--ed-space-2);">
+  {{ asignatura.nombre }}
+</h1>
+<p style="color:var(--ed-text-muted); margin:0 0 var(--ed-space-6);">
+  {{ asignatura.codigo }} · {{ periodo.nombre }}
+</p>
+
+{% if errores %}
+<div class="ed-mensaje ed-mensaje--error" role="alert" style="display:block;">
+  <strong>No se pudo procesar la matriz</strong>
+  <ul style="margin:var(--ed-space-2) 0 0; padding-left:var(--ed-space-6);">
+    {% for e in errores %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if avisos %}
+<div class="ed-mensaje" role="status"
+     style="background:var(--ed-warning-soft); color:#7a5a00;
+            border-left:3px solid var(--ed-secondary); display:block;">
+  {% for a in avisos %}<div>{{ a }}</div>{% endfor %}
+</div>
+{% endif %}
+
+{% if matriz %}
+<div class="ed-mensaje" role="status"
+     style="background:var(--ed-success-soft); color:var(--ed-success);
+            border-left:3px solid var(--ed-success); display:block;">
+  <strong>Matriz cargada</strong> — {{ matriz.semanas_totales }} semanas ·
+  {{ matriz.nombre_archivo }}
+</div>
+
+<table class="ed-tabla" style="margin-bottom:var(--ed-space-6);">
+  <caption class="ed-saltar">Contenido de la matriz</caption>
+  <thead>
+    <tr>
+      <th scope="col" style="width:80px;">Semana</th>
+      <th scope="col">Unidad / Contenido</th>
+      <th scope="col">Metodología</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in filas %}
+    <tr>
+      <td>{{ f.semana }}</td>
+      <td>{{ f.unidad_contenido }}</td>
+      <td style="color:var(--ed-text-muted);">{{ f.metodologia or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz/eliminar">
+  <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+  <button class="ed-boton ed-boton--contorno" type="submit">
+    Reemplazar matriz
+  </button>
+</form>
+
+{% else %}
+
+<div class="ed-tarjeta" style="max-width:620px;">
+  <p style="margin-top:0; font-size:var(--ed-size-sm);">
+    Suba la matriz de planificación de esta asignatura. Debe contener al menos
+    las columnas <strong>Semana</strong> y <strong>Unidad/Contenido</strong>.
+  </p>
+  <p style="font-size:var(--ed-size-sm); color:var(--ed-text-muted);">
+    La columna Unidad/Contenido es la única fuente de los temas de la guía:
+    se reproduce literalmente y en orden, sin agregar ni deducir nada.
+  </p>
+
+  <form method="post" action="/asignaturas/{{ asignatura.codigo }}/matriz"
+        enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+
+    <div class="ed-campo">
+      <label class="ed-etiqueta" for="semanas">Duración de la asignatura</label>
+      <select class="ed-entrada" id="semanas" name="semanas" required>
+        <option value="16">16 semanas</option>
+        <option value="8">8 semanas</option>
+      </select>
+    </div>
+
+    <div class="ed-campo">
+      <label class="ed-etiqueta" for="archivo">Archivo (.xlsx o .csv)</label>
+      <input class="ed-entrada" type="file" id="archivo" name="archivo"
+             accept=".xlsx,.xlsm,.csv" required>
+    </div>
+
+    <button class="ed-boton ed-boton--primario" type="submit">
+      Cargar matriz
+    </button>
+  </form>
+</div>
+
+{% endif %}
+{% endblock %}

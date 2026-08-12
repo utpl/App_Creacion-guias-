@@ -5,6 +5,12 @@ from app.modelos.academico import (
     Facultad,
     PeriodoAcademico,
 )
+from app.modelos.guia import (
+    FilaMatriz,
+    Guia,
+    MatrizPlanificacion,
+    SemanaGuia,
+)
 from app.modelos.identidad import (
     RegistroAuditoria,
     Rol,
@@ -16,6 +22,7 @@ from app.modelos.identidad import (
 
 __all__ = [
     "AsignacionDocente", "Asignatura", "Carrera", "Facultad",
-    "PeriodoAcademico", "RegistroAuditoria", "Rol", "Sesion",
+    "FilaMatriz", "Guia", "MatrizPlanificacion", "PeriodoAcademico",
+    "RegistroAuditoria", "Rol", "Sesion", "SemanaGuia",
     "TokenRecuperacion", "Usuario", "UsuarioRol",
 ]

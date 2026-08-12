@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base_datos import Base
-
+from typing import ClassVar
 
 class Facultad(Base):
     __tablename__ = "facultad"
@@ -103,3 +103,7 @@ class AsignacionDocente(Base):
 
     asignatura: Mapped["Asignatura"] = relationship()
     periodo: Mapped["PeriodoAcademico"] = relationship()
+
+    # Se rellena en tiempo de ejecucion para la vista del docente.
+    # No es columna y no se persiste.
+    companeros: ClassVar[list[str]]
