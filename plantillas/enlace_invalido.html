@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Enlace no válido · App-EdiLoja{% endblock %}
+
+{% block cuerpo %}
+<main id="contenido" class="ed-acceso">
+  <div class="ed-acceso__caja">
+
+    <div class="ed-mensaje ed-mensaje--error" role="alert">
+      {{ icono.alerta() }}
+      <span>Este enlace ya fue usado, caducó o no es válido.</span>
+    </div>
+
+    <p style="font-size:var(--ed-size-sm); color:var(--ed-text-muted);">
+      Los enlaces caducan a los 15 minutos y solo pueden usarse una vez.
+      Puede solicitar uno nuevo.
+    </p>
+
+    <a class="ed-boton ed-boton--primario ed-boton--bloque" href="/recuperar">
+      Solicitar enlace nuevo
+    </a>
+
+  </div>
+</main>
+{% endblock %}

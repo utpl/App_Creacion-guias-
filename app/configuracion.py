@@ -15,6 +15,7 @@ class Configuracion(BaseSettings):
     url_base_datos: PostgresDsn
     url_redis: RedisDsn
     clave_secreta: SecretStr
+    url_publica: str = "http://localhost:8000"
 
     # Solo la usa docker-compose para crear la base en desarrollo.
     # Se declara para que extra="forbid" no la rechace.

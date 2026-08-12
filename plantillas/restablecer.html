@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Nueva contraseña · App-EdiLoja{% endblock %}
+
+{% block cuerpo %}
+<main id="contenido" class="ed-acceso">
+  <div class="ed-acceso__caja">
+
+    <div class="ed-acceso__marca">
+      {{ icono.candado() }}
+      <div>
+        <h1 class="ed-acceso__titulo">Nueva contraseña</h1>
+        <p class="ed-acceso__subtitulo">{{ correo }}</p>
+      </div>
+    </div>
+
+    {% if error %}
+    <div class="ed-mensaje ed-mensaje--error" role="alert">
+      {{ icono.alerta() }}
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/restablecer/{{ token }}">
+      <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+
+      <div class="ed-campo">
+        <label class="ed-etiqueta" for="password">Contraseña nueva</label>
+        <input class="ed-entrada" type="password" id="password" name="password"
+               required autocomplete="new-password" autofocus
+               minlength="12" aria-describedby="ayuda-password">
+        <p id="ayuda-password"
+           style="font-size:var(--ed-size-xs); color:var(--ed-text-muted);
+                  margin:var(--ed-space-2) 0 0;">
+          Mínimo 12 caracteres. Se recomienda una frase fácil de recordar
+          y difícil de adivinar.
+        </p>
+      </div>
+
+      <div class="ed-campo">
+        <label class="ed-etiqueta" for="confirmacion">Repetir contraseña</label>
+        <input class="ed-entrada" type="password" id="confirmacion"
+               name="confirmacion" required autocomplete="new-password"
+               minlength="12">
+      </div>
+
+      <button class="ed-boton ed-boton--primario ed-boton--bloque" type="submit">
+        Guardar y entrar
+      </button>
+    </form>
+
+  </div>
+</main>
+{% endblock %}

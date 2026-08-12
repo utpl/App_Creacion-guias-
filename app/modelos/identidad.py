@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.base_datos import Base
 
 
+
 class Usuario(Base):
     __tablename__ = "usuario"
 
@@ -121,3 +122,27 @@ class RegistroAuditoria(Base):
     ocurrido_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
+class TokenRecuperacion(Base):
+    __tablename__ = "token_recuperacion"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    usuario_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("usuario.id"), index=True
+    )
+    hash_token: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+
+    creado_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    usado_en: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
+    invalidado_en: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
+    ip_solicitud: Mapped[str | None] = mapped_column(String(45), default=None)
+
+    usuario: Mapped["Usuario"] = relationship()
