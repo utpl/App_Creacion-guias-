@@ -5,7 +5,7 @@ from app.modelos import Usuario
 # El orden importa: si alguien tiene varios roles, gana el primero.
 DESTINOS = [
     ("ADMIN",         "/admin/usuarios"),
-    ("ADMIN_VRA",     "/inicio"),
+    ("ADMIN_VRA",     "/vra/catalogo"),
     ("ADMIN_EDILOJA", "/inicio"),
     ("OPERATIVO",     "/inicio"),
     ("QA",            "/inicio"),

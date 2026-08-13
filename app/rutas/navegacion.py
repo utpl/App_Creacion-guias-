@@ -4,11 +4,15 @@ from app.modelos import Usuario
 
 # (texto, url, roles que lo ven)
 ELEMENTOS = [
-    ("Inicio",         "/inicio",             None),
-    ("Mis asignaturas", "/asignaturas",       {"PROFESOR"}),
-    ("Usuarios",       "/admin/usuarios",     {"ADMIN"}),
-    ("Sesiones",       "/admin/sesiones",     {"ADMIN"}),
-    ("Auditoría",      "/admin/auditoria",    {"ADMIN"}),
+    ("Inicio",          "/inicio",           None),
+    ("Mis asignaturas", "/asignaturas",      {"PROFESOR"}),
+    ("Catálogo",        "/vra/catalogo",     {"ADMIN_VRA"}),
+    ("Periodos",        "/vra/periodos",     {"ADMIN_VRA"}),
+    ("Avance",          "/vra/avance",       {"ADMIN_VRA"}),
+    ("Usuarios",        "/admin/usuarios",   {"ADMIN"}),
+    ("Sesiones",        "/admin/sesiones",   {"ADMIN"}),
+    ("Auditoría",       "/admin/auditoria",  {"ADMIN"}),
+    ("Reglas",          "/vra/reglas",       {"ADMIN_VRA"}),
 ]
 
 

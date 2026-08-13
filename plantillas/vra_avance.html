@@ -1,0 +1,87 @@
+{% extends "marco.html" %}
+{% block titulo %}Avance institucional · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Avance institucional</h1>
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);
+          margin-top:calc(var(--ed-space-6) * -1); margin-bottom:var(--ed-space-6);">
+  {{ periodo.nombre if periodo else 'Sin periodo activo' }}
+</p>
+
+<div style="display:flex; gap:var(--ed-space-4); margin-bottom:var(--ed-space-8);
+            flex-wrap:wrap;">
+  {% for etiqueta, valor, color in tarjetas %}
+  <div class="ed-tarjeta" style="flex:1; min-width:150px; padding:var(--ed-space-4);">
+    <p style="margin:0; font-size:var(--ed-size-xs); color:var(--ed-text-muted);">
+      {{ etiqueta }}</p>
+    <p style="margin:0; font-size:var(--ed-size-xl); font-weight:700; color:{{ color }};">
+      {{ valor }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<h2 style="font-size:var(--ed-size-lg); margin:0 0 var(--ed-space-4);">
+  Por facultad</h2>
+
+<table class="ed-tabla" style="margin-bottom:var(--ed-space-8);">
+  <caption class="ed-saltar">Avance por facultad</caption>
+  <thead>
+    <tr>
+      <th scope="col">Facultad</th>
+      <th scope="col">Asignaturas</th>
+      <th scope="col">Con matriz</th>
+      <th scope="col">Con guía</th>
+      <th scope="col">Sin docente</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in por_facultad %}
+    <tr>
+      <td>{{ f.nombre }}</td>
+      <td>{{ f.asignaturas }}</td>
+      <td>{{ f.con_matriz }}</td>
+      <td>{{ f.con_guia }}</td>
+      <td>
+        {% if f.sin_docente > 0 %}
+        <span class="ed-distintivo ed-distintivo--peligro">{{ f.sin_docente }}</span>
+        {% else %}
+        <span style="color:var(--ed-text-muted);">0</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if bloqueadas %}
+<h2 style="font-size:var(--ed-size-lg); margin:0 0 var(--ed-space-4);">
+  Asignaturas sin docente titular</h2>
+
+<div class="ed-mensaje" role="alert"
+     style="background:var(--ed-warning-soft); color:#7a5a00;
+            border-left:3px solid var(--ed-secondary); display:block;">
+  Estas asignaturas no tienen quien genere su guía.
+</div>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Asignaturas bloqueadas</caption>
+  <thead>
+    <tr>
+      <th scope="col">Código</th>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Carrera</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in bloqueadas %}
+    <tr>
+      <td style="font-family:ui-monospace,monospace; font-size:var(--ed-size-xs);">
+        {{ a.codigo }}</td>
+      <td>{{ a.nombre }}</td>
+      <td style="color:var(--ed-text-muted);">{{ a.carrera.nombre }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "marco.html" %}
+{% block titulo %}Catálogo académico · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Catálogo académico</h1>
+
+<div style="display:flex; gap:var(--ed-space-4); margin-bottom:var(--ed-space-6);
+            flex-wrap:wrap;">
+  {% for etiqueta, valor in resumen %}
+  <div class="ed-tarjeta" style="flex:1; min-width:140px; padding:var(--ed-space-4);">
+    <p style="margin:0; font-size:var(--ed-size-xs); color:var(--ed-text-muted);">
+      {{ etiqueta }}</p>
+    <p style="margin:0; font-size:var(--ed-size-xl); font-weight:700;
+              color:var(--ed-primary);">{{ valor }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<form method="get" action="/vra/catalogo"
+      style="display:flex; gap:var(--ed-space-3); margin-bottom:var(--ed-space-6);
+             flex-wrap:wrap; align-items:flex-end;">
+  <div style="flex:1; min-width:220px;">
+    <label class="ed-etiqueta" for="busqueda">Buscar</label>
+    <input class="ed-entrada" type="search" id="busqueda" name="busqueda"
+           value="{{ busqueda or '' }}" placeholder="Código o nombre">
+  </div>
+  <div style="min-width:240px;">
+    <label class="ed-etiqueta" for="carrera">Carrera</label>
+    <select class="ed-entrada" id="carrera" name="carrera">
+      <option value="">Todas</option>
+      {% for c in carreras %}
+      <option value="{{ c.id }}" {% if carrera == c.id|string %}selected{% endif %}>
+        {{ c.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="ed-boton ed-boton--primario" type="submit">Filtrar</button>
+</form>
+
+<p style="color:var(--ed-text-muted); font-size:var(--ed-size-sm);">
+  {{ total }} asignatura{{ 's' if total != 1 }} · página {{ pagina }} de {{ paginas }}
+</p>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Asignaturas del catálogo</caption>
+  <thead>
+    <tr>
+      <th scope="col">Código</th>
+      <th scope="col">Asignatura</th>
+      <th scope="col">Carrera</th>
+      <th scope="col">Ciclo</th>
+      <th scope="col">Créditos</th>
+      <th scope="col">Horas</th>
+      <th scope="col">Docentes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in asignaturas %}
+    <tr>
+      <td style="font-family:ui-monospace,monospace; font-size:var(--ed-size-xs);">
+        {{ a.codigo }}</td>
+      <td>{{ a.nombre }}</td>
+      <td style="color:var(--ed-text-muted);">{{ a.carrera.nombre }}</td>
+      <td>{{ a.ciclo or '—' }}</td>
+      <td>{{ a.creditos or '—' }}</td>
+      <td style="color:var(--ed-text-muted); font-size:var(--ed-size-xs);">
+        {{ a.horas_total or '—' }}</td>
+      <td>
+        {% if docentes.get(a.id, 0) == 0 %}
+        <span class="ed-distintivo ed-distintivo--peligro">Sin docente</span>
+        {% else %}
+        {{ docentes[a.id] }}
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center; color:var(--ed-text-muted);">
+      Sin resultados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if paginas > 1 %}
+<div style="display:flex; gap:var(--ed-space-3); margin-top:var(--ed-space-4);">
+  {% if pagina > 1 %}
+  <a class="ed-boton ed-boton--contorno"
+     href="?pagina={{ pagina - 1 }}&busqueda={{ busqueda or '' }}&carrera={{ carrera or '' }}">Anterior</a>
+  {% endif %}
+  {% if pagina < paginas %}
+  <a class="ed-boton ed-boton--contorno"
+     href="?pagina={{ pagina + 1 }}&busqueda={{ busqueda or '' }}&carrera={{ carrera or '' }}">Siguiente</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

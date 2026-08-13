@@ -1,0 +1,77 @@
+{% extends "marco.html" %}
+{% import "iconos.html" as icono %}
+{% block titulo %}Periodos académicos · App-EdiLoja{% endblock %}
+
+{% block panel %}
+<h1 class="ed-titulo-pagina">Periodos académicos</h1>
+
+{% if error %}
+<div class="ed-mensaje ed-mensaje--error" role="alert">
+  {{ icono.alerta() }}<span>{{ error }}</span>
+</div>
+{% endif %}
+
+<div class="ed-tarjeta" style="max-width:520px; margin-bottom:var(--ed-space-6);">
+  <p style="margin-top:0; font-size:var(--ed-size-sm);">
+    <strong>Crear periodo</strong>
+  </p>
+  <form method="post" action="/vra/periodos">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <div class="ed-campo">
+      <label class="ed-etiqueta" for="nombre">Nombre del periodo</label>
+      <input class="ed-entrada" type="text" id="nombre" name="nombre" required
+             maxlength="60" placeholder="Abr. 2027 - Ago. 2027">
+      <p style="font-size:var(--ed-size-xs); color:var(--ed-text-muted);
+                margin:var(--ed-space-2) 0 0;">
+        Es una etiqueta de contexto. El sistema no calcula fechas a partir de ella.
+      </p>
+    </div>
+    <button class="ed-boton ed-boton--primario" type="submit">Crear</button>
+  </form>
+</div>
+
+<table class="ed-tabla">
+  <caption class="ed-saltar">Periodos académicos registrados</caption>
+  <thead>
+    <tr>
+      <th scope="col">Periodo</th>
+      <th scope="col">Estado</th>
+      <th scope="col">Asignaciones</th>
+      <th scope="col">Guías</th>
+      <th scope="col"><span class="ed-saltar">Acciones</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in periodos %}
+    <tr>
+      <td>{{ p.nombre }}</td>
+      <td>
+        {% if p.activo %}
+        <span class="ed-distintivo ed-distintivo--exito">Activo</span>
+        {% else %}
+        <span style="color:var(--ed-text-muted);">Inactivo</span>
+        {% endif %}
+      </td>
+      <td>{{ asignaciones.get(p.id, 0) }}</td>
+      <td>{{ guias.get(p.id, 0) }}</td>
+      <td>
+        {% if not p.activo %}
+        <form method="post" action="/vra/periodos/{{ p.id }}/activar">
+          <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+          <button class="ed-boton ed-boton--contorno" type="submit"
+                  style="padding:var(--ed-space-1) var(--ed-space-3);">
+            Activar
+          </button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p style="margin-top:var(--ed-space-4); font-size:var(--ed-size-sm);
+          color:var(--ed-text-muted);">
+  Solo un periodo puede estar activo. Al activar uno, el anterior se desactiva.
+</p>
+{% endblock %}
