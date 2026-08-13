@@ -19,10 +19,17 @@ from app.modelos.identidad import (
     Usuario,
     UsuarioRol,
 )
+from app.modelos.reglas import (
+    DocumentoConocimiento,
+    EspecificacionGeneracion,
+    Indicador,
+    VersionIndicadores,
+)
 
 __all__ = [
-    "AsignacionDocente", "Asignatura", "Carrera", "Facultad",
-    "FilaMatriz", "Guia", "MatrizPlanificacion", "PeriodoAcademico",
-    "RegistroAuditoria", "Rol", "Sesion", "SemanaGuia",
-    "TokenRecuperacion", "Usuario", "UsuarioRol",
+    "AsignacionDocente", "Asignatura", "Carrera", "DocumentoConocimiento",
+    "EspecificacionGeneracion", "Facultad", "FilaMatriz", "Guia",
+    "Indicador", "MatrizPlanificacion", "PeriodoAcademico",
+    "RegistroAuditoria", "Rol", "SemanaGuia", "Sesion",
+    "TokenRecuperacion", "Usuario", "UsuarioRol", "VersionIndicadores",
 ]
